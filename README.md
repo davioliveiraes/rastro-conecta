@@ -25,7 +25,7 @@ O MVP deverá conectar os eventos essenciais desse fluxo e preservar os vínculo
 - **Dados:** PostgreSQL e Redis quando necessário
 - **Infraestrutura:** Docker e Docker Compose
 
-A adoção dessas tecnologias será incremental. Nesta etapa, somente a base HTTP do backend com FastAPI está configurada.
+A adoção dessas tecnologias será incremental. Atualmente, o backend possui a base HTTP com FastAPI e a fundação de persistência com PostgreSQL, SQLAlchemy e Alembic.
 
 ## Arquitetura inicial
 
@@ -55,11 +55,27 @@ Os comandos abaixo devem ser executados a partir de `backend/`:
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 python -m pip install -e ".[dev]"
+Copy-Item .env.example .env
 ```
 
-A aplicação funciona com os valores padrão e não exige um arquivo `.env`. Quando necessário, `backend/.env.example` pode ser usado como referência para sobrescrever a configuração local.
+O `.env.example` contém somente valores locais de desenvolvimento e pode ser usado como ponto de partida. A aplicação também possui padrões locais equivalentes e continua importável sem um arquivo `.env`.
 
-Para iniciar a API em modo de desenvolvimento:
+### PostgreSQL local
+
+Na raiz do repositório, execute:
+
+```powershell
+docker compose up -d postgres
+docker compose ps
+```
+
+O Compose inicia somente o PostgreSQL e mantém seus dados em um volume nomeado.
+
+Para evitar conflito com instalações locais existentes, o banco do Rastro é publicado em `localhost:5433` e continua usando `5432` dentro do container.
+
+### API e testes
+
+A partir de `backend/`, inicie a API em modo de desenvolvimento:
 
 ```powershell
 uvicorn app.main:app --reload
@@ -74,3 +90,14 @@ pytest
 Endpoint disponível nesta etapa:
 
 - `GET /api/v1/health` — confirma que a aplicação HTTP está respondendo.
+
+### Alembic
+
+Os comandos do Alembic também devem ser executados a partir de `backend/`:
+
+```powershell
+alembic current
+alembic history
+```
+
+Ainda não existem migrações, pois o projeto não possui entidades de domínio nesta etapa.

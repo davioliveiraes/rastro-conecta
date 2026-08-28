@@ -14,10 +14,16 @@ O sistema começará como um monólito modular. Backend e regras de negócio ser
 
 - O backend é desenvolvido em Python com FastAPI.
 - O frontend será desenvolvido futuramente em React com TypeScript.
-- PostgreSQL será o banco de dados principal.
+- PostgreSQL é o banco de dados principal.
 - Redis será adotado apenas quando houver uma necessidade concreta que justifique seu uso.
 
-Nesta etapa, somente a base HTTP do backend e sua configuração estão implementadas. Persistência, cache e infraestrutura permanecem para etapas futuras.
+O backend possui a base HTTP e a fundação de persistência. Cache e os demais componentes de infraestrutura permanecem para etapas futuras.
+
+## Persistência
+
+A persistência utiliza PostgreSQL, com SQLAlchemy 2 em modo síncrono e Psycopg 3 como driver. Sessões, engine e base declarativa ficam centralizadas em `app/core/database.py`, sem abrir conexão durante a importação da aplicação.
+
+Migrações são gerenciadas pelo Alembic, que lê a mesma `DATABASE_URL` usada pela aplicação através das settings. O banco ainda não possui entidades ou migrações de domínio.
 
 ## Integrações externas
 
