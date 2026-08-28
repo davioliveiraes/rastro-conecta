@@ -1,0 +1,2 @@
+"""Rastro API application package."""
+
