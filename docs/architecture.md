@@ -55,6 +55,24 @@ O fechamento do ciclo com a Meta poderá futuramente comunicar eventos comerciai
 
 As três entidades criam apenas a fundação estrutural do multi-tenancy. Autenticação, autorização, resolução do contexto da organização, filtros automáticos e mecanismos como PostgreSQL Row Level Security não estão implementados e serão avaliados em etapas posteriores.
 
+### Request Identity
+
+A resolução da identidade do usuário é separada da seleção do tenant. Durante o desenvolvimento e os testes, `X-Rastro-User-Id` funciona como fonte temporária de identidade e somente é aceito nos ambientes `development` e `test`. Esse header não é autenticação e é explicitamente recusado em `production`; o resolvedor deverá ser substituído por autenticação real antes do uso produtivo.
+
+A identidade temporária somente é considerada válida quando o UUID corresponde a um `User` existente e ativo. A futura adoção de JWT, OAuth ou outro provedor de identidade não deverá alterar as regras de membership e isolamento do tenant.
+
+### Tenant Context
+
+A organização ativa é selecionada por requisição com `X-Rastro-Organization-Id`; ela não é persistida como atributo do usuário. A seleção somente é aceita quando existe uma `OrganizationUser` ligando o usuário atual à organização informada.
+
+Após essa validação, uma dependency do FastAPI produz um `RequestContext` imutável com `user_id`, `organization_id` e o `role` da membership. O contexto pertence exclusivamente à requisição e não utiliza estado global mutável.
+
+### Tenant Isolation
+
+Recursos futuros pertencentes a uma organização deverão ser consultados combinando o identificador do recurso com `context.organization_id`. Conhecer um UUID não concede acesso: UUID não substitui autorização, e toda operação multi-tenant deverá considerar a organização atual para prevenir acesso cruzado e vulnerabilidades como IDOR ou Broken Object Level Authorization.
+
+Essa regra estabelece a base de isolamento, mas não implementa RBAC completo, middleware global, filtros automáticos nem PostgreSQL Row Level Security.
+
 ## Webhooks e idempotência
 
 Webhooks serão uma entrada importante para eventos produzidos por sistemas externos. Seu processamento deverá considerar validação da origem, rastreabilidade, falhas e reenvios.

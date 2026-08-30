@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 
+from app.api.routes.context import router as context_router
 from app.api.routes.health import router as health_router
 from app.core.config import get_settings
 
@@ -15,8 +16,11 @@ def create_app() -> FastAPI:
         health_router,
         prefix=f"/api/{settings.api_version}",
     )
+    application.include_router(
+        context_router,
+        prefix=f"/api/{settings.api_version}",
+    )
     return application
 
 
 app = create_app()
-

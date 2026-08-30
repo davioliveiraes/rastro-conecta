@@ -110,9 +110,12 @@ Para executar os testes:
 pytest
 ```
 
-Endpoint disponível nesta etapa:
+Endpoints disponíveis nesta etapa:
 
 - `GET /api/v1/health` — confirma que a aplicação HTTP está respondendo.
+- `GET /api/v1/me/context` — retorna o usuário, a organização e o papel da membership validados para a requisição.
+
+Em `development` e `test`, o endpoint de contexto utiliza temporariamente os headers `X-Rastro-User-Id` e `X-Rastro-Organization-Id`, ambos com UUIDs de registros existentes. Esse mecanismo serve apenas ao desenvolvimento da infraestrutura multi-tenant, é recusado em `production` e deverá ser substituído por autenticação real antes do uso em produção.
 
 ### Alembic
 
