@@ -48,7 +48,7 @@ O MVP deverá provar que o Rastro consegue identificar a origem de um lead, acom
 - **Dados:** PostgreSQL e Redis quando necessário
 - **Infraestrutura:** Docker e Docker Compose
 
-A adoção dessas tecnologias será incremental. Atualmente, o backend possui a base HTTP com FastAPI e a fundação de persistência com PostgreSQL, SQLAlchemy e Alembic.
+A adoção dessas tecnologias será incremental. Atualmente, o backend possui a base HTTP com FastAPI, a fundação de persistência com PostgreSQL, SQLAlchemy e Alembic e os modelos iniciais de `Organization`, `User` e `OrganizationUser` para a estrutura multi-tenant.
 
 ## Arquitetura inicial
 
@@ -119,8 +119,9 @@ Endpoint disponível nesta etapa:
 Os comandos do Alembic também devem ser executados a partir de `backend/`:
 
 ```powershell
+alembic upgrade head
 alembic current
 alembic history
 ```
 
-Ainda não existem migrações, pois o projeto não possui entidades de domínio nesta etapa.
+A primeira migration cria somente `organizations`, `users` e `organization_users`. Ela estabelece a associação N:N entre usuários e organizações, sem implementar autenticação, autorização ou recursos de negócio.

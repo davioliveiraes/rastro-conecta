@@ -23,7 +23,7 @@ O backend possui a base HTTP e a fundação de persistência. Cache e os demais 
 
 A persistência utiliza PostgreSQL, com SQLAlchemy 2 em modo síncrono e Psycopg 3 como driver. Sessões, engine e base declarativa ficam centralizadas em `app/core/database.py`, sem abrir conexão durante a importação da aplicação.
 
-Migrações são gerenciadas pelo Alembic, que lê a mesma `DATABASE_URL` usada pela aplicação através das settings. O banco ainda não possui entidades ou migrações de domínio.
+Migrações são gerenciadas pelo Alembic, que lê a mesma `DATABASE_URL` usada pela aplicação através das settings. A primeira migration estabelece somente a fundação multi-tenant; entidades dos domínios de tracking, qualificação e atribuição permanecem para etapas futuras.
 
 ## Domínios conceituais
 
@@ -49,7 +49,11 @@ O fechamento do ciclo com a Meta poderá futuramente comunicar eventos comerciai
 
 ## Multi-tenancy
 
-O Rastro deve ser projetado com multi-tenancy em mente. `organization_id` é um conceito importante para associar dados e operações à organização correta e apoiar o isolamento entre clientes. A estratégia detalhada de isolamento será decidida antes da implementação dos dados, sem antecipá-la neste momento.
+`Organization` representa o tenant no Rastro. Um `User` pode participar de múltiplas organizações, e uma organização pode possuir múltiplos usuários; a entidade explícita `OrganizationUser` representa essa associação N:N e registra o papel básico do membro.
+
+`User` não possui `organization_id` por decisão intencional. Recursos de domínio pertencentes a um tenant deverão possuir `organization_id`, e suas futuras consultas deverão sempre considerar o contexto da organização para preservar o isolamento de dados.
+
+As três entidades criam apenas a fundação estrutural do multi-tenancy. Autenticação, autorização, resolução do contexto da organização, filtros automáticos e mecanismos como PostgreSQL Row Level Security não estão implementados e serão avaliados em etapas posteriores.
 
 ## Webhooks e idempotência
 
